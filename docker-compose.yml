@@ -1,0 +1,10 @@
+version: "1"
+
+services:
+  main-db:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      DB_USERNAME: root
+      DB_USER_PASSWORD: mongoDB
