@@ -1,8 +1,10 @@
 import type { Request, Response } from 'express';
 
-import { bookService } from '../services/book-service.js';
+import { container } from '~/container.js';
+import { BookService } from '~/features/book/index.js';
 
 const getBooksView = async (_: Request, res: Response) => {
+  const bookService = container.get(BookService);
   const books = await bookService.getBooks();
 
   if (!books) {
@@ -17,6 +19,7 @@ const getBooksView = async (_: Request, res: Response) => {
 
 const getUniqBookView = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const bookService = container.get(BookService);
   const book = await bookService.getUniqBook(id);
 
   if (!book) {
@@ -38,7 +41,7 @@ const getCreateBookView = (_: Request, res: Response) => {
 
 const createBook = async (req: Request, res: Response) => {
   const book = req.body;
-
+  const bookService = container.get(BookService);
   const createdBook = await bookService.createBook(book);
 
   if (!createdBook) {
@@ -50,6 +53,7 @@ const createBook = async (req: Request, res: Response) => {
 
 const getUpdateBookView = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const bookService = container.get(BookService);
   const book = await bookService.getUniqBook(id);
 
   if (!book) {
@@ -66,7 +70,7 @@ const updateBook = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const book = req.body;
-
+  const bookService = container.get(BookService);
   const updatedBook = await bookService.updateBook(id, book);
 
   if (!updatedBook) {
@@ -78,6 +82,7 @@ const updateBook = async (req: Request, res: Response) => {
 
 const deleteBook = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const bookService = container.get(BookService);
   const deletedBook = await bookService.deleteBook(id);
 
   if (!deletedBook.acknowledged) {

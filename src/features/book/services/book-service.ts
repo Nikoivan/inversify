@@ -1,18 +1,21 @@
+import { inject, injectable } from 'inversify';
 import type { DeleteResult } from 'mongoose';
 
-import { container } from '~/container.js';
-import { BookRepository } from '~/entities/book/repositories/book-repository.js';
-
 import { type BookSchema } from '../../../db/models/book-schema.js';
+import { BookRepository } from '../../../entities/book/repositories/book-repository.js';
 import { BookError } from '../model/book-error.js';
 import { typeguards } from '../model/typeguards.js';
 
-const bookRepository = container.get(BookRepository);
-
+@injectable()
 export class BookService {
+  constructor(
+    @inject(BookRepository)
+    private readonly bookRepository: BookRepository,
+  ) {}
+
   public async getBooks(): Promise<BookSchema[] | null> {
     try {
-      const books: BookSchema[] = await bookRepository.getBooks();
+      const books: BookSchema[] = await this.bookRepository.getBooks();
 
       if (!books) {
         return null;
@@ -32,7 +35,7 @@ export class BookService {
         throw new BookError('Отсутствует идентификатор книги', 404);
       }
 
-      const book = await bookRepository.getUniqBook(id);
+      const book = await this.bookRepository.getUniqBook(id);
 
       if (!book) {
         throw new BookError(`Книга с идентификаторм ${id} не найдена`, 404);
@@ -56,7 +59,7 @@ export class BookService {
         );
       }
 
-      const createdBook = await bookRepository.createBook(book);
+      const createdBook = await this.bookRepository.createBook(book);
 
       if (!createdBook) {
         throw new BookError('Ошибка при создание книги');
@@ -81,7 +84,7 @@ export class BookService {
         return null;
       }
 
-      const foundedBook = await bookRepository.getUniqBook(id);
+      const foundedBook = await this.bookRepository.getUniqBook(id);
 
       if (!foundedBook) {
         console.error(`Книга с идентификаторм ${id} не найдена`);
@@ -97,7 +100,7 @@ export class BookService {
         return null;
       }
 
-      const updatedBook = await bookRepository.updateBook(id, book);
+      const updatedBook = await this.bookRepository.updateBook(id, book);
 
       if (!updatedBook) {
         console.error('Ошибка при обновление книги');
@@ -120,7 +123,7 @@ export class BookService {
         return null;
       }
 
-      const book = await bookRepository.deleteBook(id);
+      const book = await this.bookRepository.deleteBook(id);
 
       if (!book) {
         console.error(`Книга с идентификаторм ${id} не найдена`);
@@ -136,5 +139,3 @@ export class BookService {
     }
   }
 }
-
-export const bookService = new BookService();
